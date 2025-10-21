@@ -1,1 +1,1658 @@
-
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "mount_file_id": "1dV2b8bd4BoNbiAFkfApQ7F3jmMXCsqS1",
+      "authorship_tag": "ABX9TyPE4EMso7Y9W7PuCC7/PByI",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/EstevahnAguilera/Data-Science-Projects/blob/main/Working_with_Data.ipynb\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "# Basic Python: Project\n",
+        "\n",
+        "## Project Description\n",
+        "In this project, you will work with data from the entertainment industry. You will study a dataset with records on movies and shows. The research will focus on the “Golden Age” of television, which began in 1999 with the release of The Sopranos and is still ongoing.\n",
+        "\n",
+        "The aim of this project is to investigate how the number of votes a title receives from IMDb users impacts its ratings. The assumption is that highly-rated shows (we will focus on TV shows, ignoring movies) released during the “Golden Age” of television also have the most votes.\n",
+        "\n",
+        "This project is similar to the tasks you will be getting in your job as a data professional. Many business decisions are initially born as assumptions, your contribution as an expert in the data domain is to answer the question “Did the assumption formulated before the study appear to be true?”\n",
+        "\n",
+        "## Description of the data:\n",
+        "The dataset movies_and_shows.csv contains information about various movies and shows, including:\n",
+        "\n",
+        "- name: The name of the actor or actress.\n",
+        "- Character: The character they played.\n",
+        "- r0le: The role type (e.g., ACTOR).\n",
+        "- TITLE: The title of the movie or show.\n",
+        "- Type: Whether it's a MOVIE or SHOW.\n",
+        "- release Year: The year it was released.\n",
+        "- genres: A list of genres the movie or show belongs to.\n",
+        "- imdb sc0re: The IMDb score of the movie or show.\n",
+        "- imdb v0tes: The number of votes on IMDb."
+      ],
+      "metadata": {
+        "id": "toxJATFTYnEg"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "# Getting Started\n",
+        "We will begind by setting up our environment.\n",
+        "\n",
+        "## Importing Libraries\n",
+        "We need to import the necessary libraries."
+      ],
+      "metadata": {
+        "id": "HDH1zB-9cVh7"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Importing necessary libraries for google sheets\n",
+        "from google.colab import auth\n",
+        "auth.authenticate_user()\n",
+        "\n",
+        "import gspread\n",
+        "from google.auth import default\n",
+        "creds, _ = default()\n",
+        "\n",
+        "gc = gspread.authorize(creds)\n",
+        "\n",
+        "# Opening the worksheet\n",
+        "worksheet = gc.open('movies_and_shows').sheet1\n",
+        "\n",
+        "# get_all_records gives a list of rows.\n",
+        "rows = worksheet.get_all_records()\n",
+        "\n",
+        "# Convert to a DataFrame and render.\n",
+        "df = pd.DataFrame.from_records(rows)\n",
+        "print(df)\n",
+        "\n",
+        "# Importing pandas\n",
+        "import pandas as pd"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "vGiEiJZ2xyXA",
+        "outputId": "d7225c7c-324d-4686-97ee-3600d68653dd"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "                     name                Character      r0le        TITLE  \\\n",
+            "0          Robert De Niro            Travis Bickle     ACTOR  Taxi Driver   \n",
+            "1            Jodie Foster            Iris Steensma     ACTOR  Taxi Driver   \n",
+            "2           Albert Brooks                      Tom     ACTOR  Taxi Driver   \n",
+            "3           Harvey Keitel  Matthew 'Sport' Higgins     ACTOR  Taxi Driver   \n",
+            "4         Cybill Shepherd                    Betsy     ACTOR  Taxi Driver   \n",
+            "...                   ...                      ...       ...          ...   \n",
+            "85574    Adelaida Buscato               Mar??a Paz     ACTOR      Lokillo   \n",
+            "85575  Luz Stella Luengas             Karen Bayona     ACTOR      Lokillo   \n",
+            "85576        In??s Prieto                    Fanny     ACTOR      Lokillo   \n",
+            "85577        Isabel Gaona                   Cacica     ACTOR      Lokillo   \n",
+            "85578      Julian Gaviria                  unknown  DIRECTOR      Lokillo   \n",
+            "\n",
+            "            Type  release Year              genres imdb sc0re imdb v0tes  \n",
+            "0          MOVIE          1976  ['drama', 'crime']        8.2     808582  \n",
+            "1          MOVIE          1976  ['drama', 'crime']        8.2     808582  \n",
+            "2          MOVIE          1976  ['drama', 'crime']        8.2     808582  \n",
+            "3          MOVIE          1976  ['drama', 'crime']        8.2     808582  \n",
+            "4          MOVIE          1976  ['drama', 'crime']        8.2     808582  \n",
+            "...          ...           ...                 ...        ...        ...  \n",
+            "85574  the movie          2021          ['comedy']        3.8         68  \n",
+            "85575  the movie          2021          ['comedy']        3.8         68  \n",
+            "85576  the movie          2021          ['comedy']        3.8         68  \n",
+            "85577      MOVIE          2021          ['comedy']        3.8         68  \n",
+            "85578  the movie          2021          ['comedy']        3.8         68  \n",
+            "\n",
+            "[85579 rows x 9 columns]\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "Next, we will load the dataset into a pandas DataFrame to begin analysis."
+      ],
+      "metadata": {
+        "id": "GaF4BT0Sc5Dn"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Displaying the first few rows of the DataFrame\n",
+        "display(df.head())"
+      ],
+      "metadata": {
+        "id": "VqUTp93qdDVr",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 348
+        },
+        "outputId": "5286da09-f524-407e-9d7b-ffc0e30e6fe2"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "display_data",
+          "data": {
+            "text/plain": [
+              "              name                Character   r0le        TITLE   Type  \\\n",
+              "0   Robert De Niro            Travis Bickle  ACTOR  Taxi Driver  MOVIE   \n",
+              "1     Jodie Foster            Iris Steensma  ACTOR  Taxi Driver  MOVIE   \n",
+              "2    Albert Brooks                      Tom  ACTOR  Taxi Driver  MOVIE   \n",
+              "3    Harvey Keitel  Matthew 'Sport' Higgins  ACTOR  Taxi Driver  MOVIE   \n",
+              "4  Cybill Shepherd                    Betsy  ACTOR  Taxi Driver  MOVIE   \n",
+              "\n",
+              "   release Year              genres imdb sc0re imdb v0tes  \n",
+              "0          1976  ['drama', 'crime']        8.2     808582  \n",
+              "1          1976  ['drama', 'crime']        8.2     808582  \n",
+              "2          1976  ['drama', 'crime']        8.2     808582  \n",
+              "3          1976  ['drama', 'crime']        8.2     808582  \n",
+              "4          1976  ['drama', 'crime']        8.2     808582  "
+            ],
+            "text/html": [
+              "\n",
+              "  <div id=\"df-9c8b2c71-4757-4b64-8550-c947b85d80d8\" class=\"colab-df-container\">\n",
+              "    <div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>name</th>\n",
+              "      <th>Character</th>\n",
+              "      <th>r0le</th>\n",
+              "      <th>TITLE</th>\n",
+              "      <th>Type</th>\n",
+              "      <th>release Year</th>\n",
+              "      <th>genres</th>\n",
+              "      <th>imdb sc0re</th>\n",
+              "      <th>imdb v0tes</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>0</th>\n",
+              "      <td>Robert De Niro</td>\n",
+              "      <td>Travis Bickle</td>\n",
+              "      <td>ACTOR</td>\n",
+              "      <td>Taxi Driver</td>\n",
+              "      <td>MOVIE</td>\n",
+              "      <td>1976</td>\n",
+              "      <td>['drama', 'crime']</td>\n",
+              "      <td>8.2</td>\n",
+              "      <td>808582</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>1</th>\n",
+              "      <td>Jodie Foster</td>\n",
+              "      <td>Iris Steensma</td>\n",
+              "      <td>ACTOR</td>\n",
+              "      <td>Taxi Driver</td>\n",
+              "      <td>MOVIE</td>\n",
+              "      <td>1976</td>\n",
+              "      <td>['drama', 'crime']</td>\n",
+              "      <td>8.2</td>\n",
+              "      <td>808582</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2</th>\n",
+              "      <td>Albert Brooks</td>\n",
+              "      <td>Tom</td>\n",
+              "      <td>ACTOR</td>\n",
+              "      <td>Taxi Driver</td>\n",
+              "      <td>MOVIE</td>\n",
+              "      <td>1976</td>\n",
+              "      <td>['drama', 'crime']</td>\n",
+              "      <td>8.2</td>\n",
+              "      <td>808582</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>3</th>\n",
+              "      <td>Harvey Keitel</td>\n",
+              "      <td>Matthew 'Sport' Higgins</td>\n",
+              "      <td>ACTOR</td>\n",
+              "      <td>Taxi Driver</td>\n",
+              "      <td>MOVIE</td>\n",
+              "      <td>1976</td>\n",
+              "      <td>['drama', 'crime']</td>\n",
+              "      <td>8.2</td>\n",
+              "      <td>808582</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>4</th>\n",
+              "      <td>Cybill Shepherd</td>\n",
+              "      <td>Betsy</td>\n",
+              "      <td>ACTOR</td>\n",
+              "      <td>Taxi Driver</td>\n",
+              "      <td>MOVIE</td>\n",
+              "      <td>1976</td>\n",
+              "      <td>['drama', 'crime']</td>\n",
+              "      <td>8.2</td>\n",
+              "      <td>808582</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div>\n",
+              "    <div class=\"colab-df-buttons\">\n",
+              "\n",
+              "  <div class=\"colab-df-container\">\n",
+              "    <button class=\"colab-df-convert\" onclick=\"convertToInteractive('df-9c8b2c71-4757-4b64-8550-c947b85d80d8')\"\n",
+              "            title=\"Convert this dataframe to an interactive table.\"\n",
+              "            style=\"display:none;\">\n",
+              "\n",
+              "  <svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24px\" viewBox=\"0 -960 960 960\">\n",
+              "    <path d=\"M120-120v-720h720v720H120Zm60-500h600v-160H180v160Zm220 220h160v-160H400v160Zm0 220h160v-160H400v160ZM180-400h160v-160H180v160Zm440 0h160v-160H620v160ZM180-180h160v-160H180v160Zm440 0h160v-160H620v160Z\"/>\n",
+              "  </svg>\n",
+              "    </button>\n",
+              "\n",
+              "  <style>\n",
+              "    .colab-df-container {\n",
+              "      display:flex;\n",
+              "      gap: 12px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert {\n",
+              "      background-color: #E8F0FE;\n",
+              "      border: none;\n",
+              "      border-radius: 50%;\n",
+              "      cursor: pointer;\n",
+              "      display: none;\n",
+              "      fill: #1967D2;\n",
+              "      height: 32px;\n",
+              "      padding: 0 0 0 0;\n",
+              "      width: 32px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert:hover {\n",
+              "      background-color: #E2EBFA;\n",
+              "      box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 1px 3px 1px rgba(60, 64, 67, 0.15);\n",
+              "      fill: #174EA6;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-buttons div {\n",
+              "      margin-bottom: 4px;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert {\n",
+              "      background-color: #3B4455;\n",
+              "      fill: #D2E3FC;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert:hover {\n",
+              "      background-color: #434B5C;\n",
+              "      box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);\n",
+              "      filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));\n",
+              "      fill: #FFFFFF;\n",
+              "    }\n",
+              "  </style>\n",
+              "\n",
+              "    <script>\n",
+              "      const buttonEl =\n",
+              "        document.querySelector('#df-9c8b2c71-4757-4b64-8550-c947b85d80d8 button.colab-df-convert');\n",
+              "      buttonEl.style.display =\n",
+              "        google.colab.kernel.accessAllowed ? 'block' : 'none';\n",
+              "\n",
+              "      async function convertToInteractive(key) {\n",
+              "        const element = document.querySelector('#df-9c8b2c71-4757-4b64-8550-c947b85d80d8');\n",
+              "        const dataTable =\n",
+              "          await google.colab.kernel.invokeFunction('convertToInteractive',\n",
+              "                                                    [key], {});\n",
+              "        if (!dataTable) return;\n",
+              "\n",
+              "        const docLinkHtml = 'Like what you see? Visit the ' +\n",
+              "          '<a target=\"_blank\" href=https://colab.research.google.com/notebooks/data_table.ipynb>data table notebook</a>'\n",
+              "          + ' to learn more about interactive tables.';\n",
+              "        element.innerHTML = '';\n",
+              "        dataTable['output_type'] = 'display_data';\n",
+              "        await google.colab.output.renderOutput(dataTable, element);\n",
+              "        const docLink = document.createElement('div');\n",
+              "        docLink.innerHTML = docLinkHtml;\n",
+              "        element.appendChild(docLink);\n",
+              "      }\n",
+              "    </script>\n",
+              "  </div>\n",
+              "\n",
+              "\n",
+              "    <div id=\"df-62e4eb9b-e5db-431f-987e-283b64f3876b\">\n",
+              "      <button class=\"colab-df-quickchart\" onclick=\"quickchart('df-62e4eb9b-e5db-431f-987e-283b64f3876b')\"\n",
+              "                title=\"Suggest charts\"\n",
+              "                style=\"display:none;\">\n",
+              "\n",
+              "<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24px\"viewBox=\"0 0 24 24\"\n",
+              "     width=\"24px\">\n",
+              "    <g>\n",
+              "        <path d=\"M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z\"/>\n",
+              "    </g>\n",
+              "</svg>\n",
+              "      </button>\n",
+              "\n",
+              "<style>\n",
+              "  .colab-df-quickchart {\n",
+              "      --bg-color: #E8F0FE;\n",
+              "      --fill-color: #1967D2;\n",
+              "      --hover-bg-color: #E2EBFA;\n",
+              "      --hover-fill-color: #174EA6;\n",
+              "      --disabled-fill-color: #AAA;\n",
+              "      --disabled-bg-color: #DDD;\n",
+              "  }\n",
+              "\n",
+              "  [theme=dark] .colab-df-quickchart {\n",
+              "      --bg-color: #3B4455;\n",
+              "      --fill-color: #D2E3FC;\n",
+              "      --hover-bg-color: #434B5C;\n",
+              "      --hover-fill-color: #FFFFFF;\n",
+              "      --disabled-bg-color: #3B4455;\n",
+              "      --disabled-fill-color: #666;\n",
+              "  }\n",
+              "\n",
+              "  .colab-df-quickchart {\n",
+              "    background-color: var(--bg-color);\n",
+              "    border: none;\n",
+              "    border-radius: 50%;\n",
+              "    cursor: pointer;\n",
+              "    display: none;\n",
+              "    fill: var(--fill-color);\n",
+              "    height: 32px;\n",
+              "    padding: 0;\n",
+              "    width: 32px;\n",
+              "  }\n",
+              "\n",
+              "  .colab-df-quickchart:hover {\n",
+              "    background-color: var(--hover-bg-color);\n",
+              "    box-shadow: 0 1px 2px rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);\n",
+              "    fill: var(--button-hover-fill-color);\n",
+              "  }\n",
+              "\n",
+              "  .colab-df-quickchart-complete:disabled,\n",
+              "  .colab-df-quickchart-complete:disabled:hover {\n",
+              "    background-color: var(--disabled-bg-color);\n",
+              "    fill: var(--disabled-fill-color);\n",
+              "    box-shadow: none;\n",
+              "  }\n",
+              "\n",
+              "  .colab-df-spinner {\n",
+              "    border: 2px solid var(--fill-color);\n",
+              "    border-color: transparent;\n",
+              "    border-bottom-color: var(--fill-color);\n",
+              "    animation:\n",
+              "      spin 1s steps(1) infinite;\n",
+              "  }\n",
+              "\n",
+              "  @keyframes spin {\n",
+              "    0% {\n",
+              "      border-color: transparent;\n",
+              "      border-bottom-color: var(--fill-color);\n",
+              "      border-left-color: var(--fill-color);\n",
+              "    }\n",
+              "    20% {\n",
+              "      border-color: transparent;\n",
+              "      border-left-color: var(--fill-color);\n",
+              "      border-top-color: var(--fill-color);\n",
+              "    }\n",
+              "    30% {\n",
+              "      border-color: transparent;\n",
+              "      border-left-color: var(--fill-color);\n",
+              "      border-top-color: var(--fill-color);\n",
+              "      border-right-color: var(--fill-color);\n",
+              "    }\n",
+              "    40% {\n",
+              "      border-color: transparent;\n",
+              "      border-right-color: var(--fill-color);\n",
+              "      border-top-color: var(--fill-color);\n",
+              "    }\n",
+              "    60% {\n",
+              "      border-color: transparent;\n",
+              "      border-right-color: var(--fill-color);\n",
+              "    }\n",
+              "    80% {\n",
+              "      border-color: transparent;\n",
+              "      border-right-color: var(--fill-color);\n",
+              "      border-bottom-color: var(--fill-color);\n",
+              "    }\n",
+              "    90% {\n",
+              "      border-color: transparent;\n",
+              "      border-bottom-color: var(--fill-color);\n",
+              "    }\n",
+              "  }\n",
+              "</style>\n",
+              "\n",
+              "      <script>\n",
+              "        async function quickchart(key) {\n",
+              "          const quickchartButtonEl =\n",
+              "            document.querySelector('#' + key + ' button');\n",
+              "          quickchartButtonEl.disabled = true;  // To prevent multiple clicks.\n",
+              "          quickchartButtonEl.classList.add('colab-df-spinner');\n",
+              "          try {\n",
+              "            const charts = await google.colab.kernel.invokeFunction(\n",
+              "                'suggestCharts', [key], {});\n",
+              "          } catch (error) {\n",
+              "            console.error('Error during call to suggestCharts:', error);\n",
+              "          }\n",
+              "          quickchartButtonEl.classList.remove('colab-df-spinner');\n",
+              "          quickchartButtonEl.classList.add('colab-df-quickchart-complete');\n",
+              "        }\n",
+              "        (() => {\n",
+              "          let quickchartButtonEl =\n",
+              "            document.querySelector('#df-62e4eb9b-e5db-431f-987e-283b64f3876b button');\n",
+              "          quickchartButtonEl.style.display =\n",
+              "            google.colab.kernel.accessAllowed ? 'block' : 'none';\n",
+              "        })();\n",
+              "      </script>\n",
+              "    </div>\n",
+              "\n",
+              "    </div>\n",
+              "  </div>\n"
+            ],
+            "application/vnd.google.colaboratory.intrinsic+json": {
+              "type": "dataframe",
+              "summary": "{\n  \"name\": \"display(df\",\n  \"rows\": 5,\n  \"fields\": [\n    {\n      \"column\": \"name\",\n      \"properties\": {\n        \"dtype\": \"string\",\n        \"num_unique_values\": 5,\n        \"samples\": [\n          \"Jodie Foster\",\n          \"Cybill Shepherd\",\n          \"Albert Brooks\"\n        ],\n        \"semantic_type\": \"\",\n        \"description\": \"\"\n      }\n    },\n    {\n      \"column\": \"Character\",\n      \"properties\": {\n        \"dtype\": \"string\",\n        \"num_unique_values\": 5,\n        \"samples\": [\n          \"Iris Steensma\",\n          \"Betsy\",\n          \"Tom\"\n        ],\n        \"semantic_type\": \"\",\n        \"description\": \"\"\n      }\n    },\n    {\n      \"column\": \"r0le\",\n      \"properties\": {\n        \"dtype\": \"category\",\n        \"num_unique_values\": 1,\n        \"samples\": [\n          \"ACTOR\"\n        ],\n        \"semantic_type\": \"\",\n        \"description\": \"\"\n      }\n    },\n    {\n      \"column\": \"TITLE\",\n      \"properties\": {\n        \"dtype\": \"category\",\n        \"num_unique_values\": 1,\n        \"samples\": [\n          \"Taxi Driver\"\n        ],\n        \"semantic_type\": \"\",\n        \"description\": \"\"\n      }\n    },\n    {\n      \"column\": \"Type\",\n      \"properties\": {\n        \"dtype\": \"category\",\n        \"num_unique_values\": 1,\n        \"samples\": [\n          \"MOVIE\"\n        ],\n        \"semantic_type\": \"\",\n        \"description\": \"\"\n      }\n    },\n    {\n      \"column\": \"release Year\",\n      \"properties\": {\n        \"dtype\": \"number\",\n        \"std\": 0,\n        \"min\": 1976,\n        \"max\": 1976,\n        \"num_unique_values\": 1,\n        \"samples\": [\n          1976\n        ],\n        \"semantic_type\": \"\",\n        \"description\": \"\"\n      }\n    },\n    {\n      \"column\": \"genres\",\n      \"properties\": {\n        \"dtype\": \"category\",\n        \"num_unique_values\": 1,\n        \"samples\": [\n          \"['drama', 'crime']\"\n        ],\n        \"semantic_type\": \"\",\n        \"description\": \"\"\n      }\n    },\n    {\n      \"column\": \"imdb sc0re\",\n      \"properties\": {\n        \"dtype\": \"date\",\n        \"min\": 8.2,\n        \"max\": 8.2,\n        \"num_unique_values\": 1,\n        \"samples\": [\n          8.2\n        ],\n        \"semantic_type\": \"\",\n        \"description\": \"\"\n      }\n    },\n    {\n      \"column\": \"imdb v0tes\",\n      \"properties\": {\n        \"dtype\": \"date\",\n        \"min\": 808582,\n        \"max\": 808582,\n        \"num_unique_values\": 1,\n        \"samples\": [\n          808582\n        ],\n        \"semantic_type\": \"\",\n        \"description\": \"\"\n      }\n    }\n  ]\n}"
+            }
+          },
+          "metadata": {}
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "Understanding the structure and content of your data is important before performing any analysis.\n",
+        "\n",
+        "We will need to look at the DataFrame's information."
+      ],
+      "metadata": {
+        "id": "YhD-0tMNdY_3"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Getting information about the DataFrame and the column names\n",
+        "df.info()\n",
+        "\n",
+        "print(df.columns)"
+      ],
+      "metadata": {
+        "id": "megOcxPqdnrd",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "fdeb16eb-c436-4bb8-a68b-63e0d6df904d"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "<class 'pandas.core.frame.DataFrame'>\n",
+            "RangeIndex: 85579 entries, 0 to 85578\n",
+            "Data columns (total 9 columns):\n",
+            " #   Column        Non-Null Count  Dtype \n",
+            "---  ------        --------------  ----- \n",
+            " 0   name          85579 non-null  object\n",
+            " 1   Character     85577 non-null  object\n",
+            " 2   r0le          85579 non-null  object\n",
+            " 3   TITLE         85579 non-null  object\n",
+            " 4   Type          85579 non-null  object\n",
+            " 5   release Year  85579 non-null  int64 \n",
+            " 6   genres        85579 non-null  object\n",
+            " 7   imdb sc0re    85579 non-null  object\n",
+            " 8   imdb v0tes    85579 non-null  object\n",
+            "dtypes: int64(1), object(8)\n",
+            "memory usage: 5.9+ MB\n",
+            "Index(['name', 'Character', 'r0le', 'TITLE', 'Type', 'release Year', 'genres',\n",
+            "       'imdb sc0re', 'imdb v0tes'],\n",
+            "      dtype='object')\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "# Task 1: Data Cleaning\n",
+        "Let's clean the data to fix issues with the column names.\n",
+        "\n",
+        "We need to rename the columns to correct any errors and make them consistent."
+      ],
+      "metadata": {
+        "id": "b0Fu_WD3d9tG"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Rename columns to make them consistent and correct errors\n",
+        "df = df.rename(\n",
+        "    columns = {\n",
+        "        '   name': 'name',\n",
+        "        'Character':'character',\n",
+        "        'r0le':'role ',\n",
+        "        'TITLE':'title ',\n",
+        "        'Type': 'type ',\n",
+        "        'release Year':'release_year',\n",
+        "        'imdb sc0re':'imdb_score',\n",
+        "        'imdb v0tes':'imdb_votes'\n",
+        "    }\n",
+        ")\n",
+        "\n",
+        "# Printing the updated column names to confirm the changes\n",
+        "print(df.columns)"
+      ],
+      "metadata": {
+        "id": "Ib9ZHinPeO2e",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "8145d2a7-43a9-46aa-8506-c3c21b50f78a"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Index(['name', 'character', 'role ', 'title ', 'type ', 'release_year',\n",
+            "       'genres', 'imdb_score', 'imdb_votes'],\n",
+            "      dtype='object')\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "# Task 2: Correcting a Misspelled Name in the Data\n",
+        "While analyzing the dataset, you notice that some names are misspelled of contain special characters due to encoding issues. Accurate data is essntials for reporting and recommendations, so let's correct one of these entries."
+      ],
+      "metadata": {
+        "id": "juQLXWdcfIGW"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Looking at the Unique names in the Data\n",
+        "print(df['name'].unique())"
+      ],
+      "metadata": {
+        "id": "QpvsIz56tp1V",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "e386ec91-5e90-4fef-b5cb-99dbca8576a4"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "['Robert De Niro' 'Jodie Foster' 'Albert Brooks' ... 'In??s Prieto'\n",
+            " 'Isabel Gaona' 'Julian Gaviria']\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "We can see that \"In??s Preito\" is misspelled.\n",
+        "- Using .loc[], retrieve the row where name is \"In??s Preito\" and print the row to verify that you have the correct one.\n",
+        "- Using .loc[], update the name column for this row to \"Ines Prieto\".\n",
+        "- Verify the row again to ensure that the name has been corrected."
+      ],
+      "metadata": {
+        "id": "4LRCFuWdzJp4"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Locate the row(s) with the incorrect name\n",
+        "print(df.loc[df['name'] == \"In??s Prieto\"])\n",
+        "\n",
+        "# Correcting the name\n",
+        "df.loc[df['name'] == \"In??s Prieto\", 'name'] = \"Ines Prieto\""
+      ],
+      "metadata": {
+        "id": "4rppl1N9ztxD",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "4a2f3070-f156-41a3-e6eb-48e8c42e716b"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "               name character  role    title       type   release_year  \\\n",
+            "77798  In??s Prieto     Fanny  ACTOR  Lokillo      MOVIE          2021   \n",
+            "85576  In??s Prieto     Fanny  ACTOR  Lokillo  the movie          2021   \n",
+            "\n",
+            "           genres imdb_score imdb_votes  \n",
+            "77798  ['comedy']        3.8         68  \n",
+            "85576  ['comedy']        3.8         68  \n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Verify the correction\n",
+        "print(df.loc[df['name'] == \"Ines Prieto\"])"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "hCZZb0CN1L34",
+        "outputId": "169466ab-c2f5-49dc-8a62-759a852f2b34"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "              name character  role    title       type   release_year  \\\n",
+            "77798  Ines Prieto     Fanny  ACTOR  Lokillo      MOVIE          2021   \n",
+            "85576  Ines Prieto     Fanny  ACTOR  Lokillo  the movie          2021   \n",
+            "\n",
+            "           genres imdb_score imdb_votes  \n",
+            "77798  ['comedy']        3.8         68  \n",
+            "85576  ['comedy']        3.8         68  \n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "# Task 3: Finding All Movies and Shows Featuring Ines Prieto\n",
+        "Now that we've corrected the spelling of \"Ines Prieto\" in the dataset, let's find all the TV shows and movies she has acted in. This type of filtering is helpful for generating actor-specific profiles or building a list of their works.\n",
+        "\n",
+        "- Using a filtering condition, select rows where the name column is \"Ines Prieto\".\n",
+        "- From each matching row, retrive onlt the title, release_year, imbd_score, and genres columns for a clear, concise output."
+      ],
+      "metadata": {
+        "id": "tRNR7QJ50ca_"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Filtering rows where the actor's name is \"Ines Prieto\"\n",
+        "df.loc[df['name'] == \"Ines Prieto\"]"
+      ],
+      "metadata": {
+        "id": "p2obWCzN1Hre",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 167
+        },
+        "outputId": "af78488d-47f8-4220-8e9d-a9f292d82346"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "              name character  role    title       type   release_year  \\\n",
+              "77798  Ines Prieto     Fanny  ACTOR  Lokillo      MOVIE          2021   \n",
+              "85576  Ines Prieto     Fanny  ACTOR  Lokillo  the movie          2021   \n",
+              "\n",
+              "           genres imdb_score imdb_votes  \n",
+              "77798  ['comedy']        3.8         68  \n",
+              "85576  ['comedy']        3.8         68  "
+            ],
+            "text/html": [
+              "\n",
+              "  <div id=\"df-6ae80d86-d3e4-4b02-801f-abc9b764ae49\" class=\"colab-df-container\">\n",
+              "    <div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>name</th>\n",
+              "      <th>character</th>\n",
+              "      <th>role</th>\n",
+              "      <th>title</th>\n",
+              "      <th>type</th>\n",
+              "      <th>release_year</th>\n",
+              "      <th>genres</th>\n",
+              "      <th>imdb_score</th>\n",
+              "      <th>imdb_votes</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>77798</th>\n",
+              "      <td>Ines Prieto</td>\n",
+              "      <td>Fanny</td>\n",
+              "      <td>ACTOR</td>\n",
+              "      <td>Lokillo</td>\n",
+              "      <td>MOVIE</td>\n",
+              "      <td>2021</td>\n",
+              "      <td>['comedy']</td>\n",
+              "      <td>3.8</td>\n",
+              "      <td>68</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>85576</th>\n",
+              "      <td>Ines Prieto</td>\n",
+              "      <td>Fanny</td>\n",
+              "      <td>ACTOR</td>\n",
+              "      <td>Lokillo</td>\n",
+              "      <td>the movie</td>\n",
+              "      <td>2021</td>\n",
+              "      <td>['comedy']</td>\n",
+              "      <td>3.8</td>\n",
+              "      <td>68</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div>\n",
+              "    <div class=\"colab-df-buttons\">\n",
+              "\n",
+              "  <div class=\"colab-df-container\">\n",
+              "    <button class=\"colab-df-convert\" onclick=\"convertToInteractive('df-6ae80d86-d3e4-4b02-801f-abc9b764ae49')\"\n",
+              "            title=\"Convert this dataframe to an interactive table.\"\n",
+              "            style=\"display:none;\">\n",
+              "\n",
+              "  <svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24px\" viewBox=\"0 -960 960 960\">\n",
+              "    <path d=\"M120-120v-720h720v720H120Zm60-500h600v-160H180v160Zm220 220h160v-160H400v160Zm0 220h160v-160H400v160ZM180-400h160v-160H180v160Zm440 0h160v-160H620v160ZM180-180h160v-160H180v160Zm440 0h160v-160H620v160Z\"/>\n",
+              "  </svg>\n",
+              "    </button>\n",
+              "\n",
+              "  <style>\n",
+              "    .colab-df-container {\n",
+              "      display:flex;\n",
+              "      gap: 12px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert {\n",
+              "      background-color: #E8F0FE;\n",
+              "      border: none;\n",
+              "      border-radius: 50%;\n",
+              "      cursor: pointer;\n",
+              "      display: none;\n",
+              "      fill: #1967D2;\n",
+              "      height: 32px;\n",
+              "      padding: 0 0 0 0;\n",
+              "      width: 32px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert:hover {\n",
+              "      background-color: #E2EBFA;\n",
+              "      box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 1px 3px 1px rgba(60, 64, 67, 0.15);\n",
+              "      fill: #174EA6;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-buttons div {\n",
+              "      margin-bottom: 4px;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert {\n",
+              "      background-color: #3B4455;\n",
+              "      fill: #D2E3FC;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert:hover {\n",
+              "      background-color: #434B5C;\n",
+              "      box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);\n",
+              "      filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));\n",
+              "      fill: #FFFFFF;\n",
+              "    }\n",
+              "  </style>\n",
+              "\n",
+              "    <script>\n",
+              "      const buttonEl =\n",
+              "        document.querySelector('#df-6ae80d86-d3e4-4b02-801f-abc9b764ae49 button.colab-df-convert');\n",
+              "      buttonEl.style.display =\n",
+              "        google.colab.kernel.accessAllowed ? 'block' : 'none';\n",
+              "\n",
+              "      async function convertToInteractive(key) {\n",
+              "        const element = document.querySelector('#df-6ae80d86-d3e4-4b02-801f-abc9b764ae49');\n",
+              "        const dataTable =\n",
+              "          await google.colab.kernel.invokeFunction('convertToInteractive',\n",
+              "                                                    [key], {});\n",
+              "        if (!dataTable) return;\n",
+              "\n",
+              "        const docLinkHtml = 'Like what you see? Visit the ' +\n",
+              "          '<a target=\"_blank\" href=https://colab.research.google.com/notebooks/data_table.ipynb>data table notebook</a>'\n",
+              "          + ' to learn more about interactive tables.';\n",
+              "        element.innerHTML = '';\n",
+              "        dataTable['output_type'] = 'display_data';\n",
+              "        await google.colab.output.renderOutput(dataTable, element);\n",
+              "        const docLink = document.createElement('div');\n",
+              "        docLink.innerHTML = docLinkHtml;\n",
+              "        element.appendChild(docLink);\n",
+              "      }\n",
+              "    </script>\n",
+              "  </div>\n",
+              "\n",
+              "\n",
+              "    <div id=\"df-dd46c47e-6c5d-40df-9ece-cac6fb87b6ff\">\n",
+              "      <button class=\"colab-df-quickchart\" onclick=\"quickchart('df-dd46c47e-6c5d-40df-9ece-cac6fb87b6ff')\"\n",
+              "                title=\"Suggest charts\"\n",
+              "                style=\"display:none;\">\n",
+              "\n",
+              "<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24px\"viewBox=\"0 0 24 24\"\n",
+              "     width=\"24px\">\n",
+              "    <g>\n",
+              "        <path d=\"M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z\"/>\n",
+              "    </g>\n",
+              "</svg>\n",
+              "      </button>\n",
+              "\n",
+              "<style>\n",
+              "  .colab-df-quickchart {\n",
+              "      --bg-color: #E8F0FE;\n",
+              "      --fill-color: #1967D2;\n",
+              "      --hover-bg-color: #E2EBFA;\n",
+              "      --hover-fill-color: #174EA6;\n",
+              "      --disabled-fill-color: #AAA;\n",
+              "      --disabled-bg-color: #DDD;\n",
+              "  }\n",
+              "\n",
+              "  [theme=dark] .colab-df-quickchart {\n",
+              "      --bg-color: #3B4455;\n",
+              "      --fill-color: #D2E3FC;\n",
+              "      --hover-bg-color: #434B5C;\n",
+              "      --hover-fill-color: #FFFFFF;\n",
+              "      --disabled-bg-color: #3B4455;\n",
+              "      --disabled-fill-color: #666;\n",
+              "  }\n",
+              "\n",
+              "  .colab-df-quickchart {\n",
+              "    background-color: var(--bg-color);\n",
+              "    border: none;\n",
+              "    border-radius: 50%;\n",
+              "    cursor: pointer;\n",
+              "    display: none;\n",
+              "    fill: var(--fill-color);\n",
+              "    height: 32px;\n",
+              "    padding: 0;\n",
+              "    width: 32px;\n",
+              "  }\n",
+              "\n",
+              "  .colab-df-quickchart:hover {\n",
+              "    background-color: var(--hover-bg-color);\n",
+              "    box-shadow: 0 1px 2px rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);\n",
+              "    fill: var(--button-hover-fill-color);\n",
+              "  }\n",
+              "\n",
+              "  .colab-df-quickchart-complete:disabled,\n",
+              "  .colab-df-quickchart-complete:disabled:hover {\n",
+              "    background-color: var(--disabled-bg-color);\n",
+              "    fill: var(--disabled-fill-color);\n",
+              "    box-shadow: none;\n",
+              "  }\n",
+              "\n",
+              "  .colab-df-spinner {\n",
+              "    border: 2px solid var(--fill-color);\n",
+              "    border-color: transparent;\n",
+              "    border-bottom-color: var(--fill-color);\n",
+              "    animation:\n",
+              "      spin 1s steps(1) infinite;\n",
+              "  }\n",
+              "\n",
+              "  @keyframes spin {\n",
+              "    0% {\n",
+              "      border-color: transparent;\n",
+              "      border-bottom-color: var(--fill-color);\n",
+              "      border-left-color: var(--fill-color);\n",
+              "    }\n",
+              "    20% {\n",
+              "      border-color: transparent;\n",
+              "      border-left-color: var(--fill-color);\n",
+              "      border-top-color: var(--fill-color);\n",
+              "    }\n",
+              "    30% {\n",
+              "      border-color: transparent;\n",
+              "      border-left-color: var(--fill-color);\n",
+              "      border-top-color: var(--fill-color);\n",
+              "      border-right-color: var(--fill-color);\n",
+              "    }\n",
+              "    40% {\n",
+              "      border-color: transparent;\n",
+              "      border-right-color: var(--fill-color);\n",
+              "      border-top-color: var(--fill-color);\n",
+              "    }\n",
+              "    60% {\n",
+              "      border-color: transparent;\n",
+              "      border-right-color: var(--fill-color);\n",
+              "    }\n",
+              "    80% {\n",
+              "      border-color: transparent;\n",
+              "      border-right-color: var(--fill-color);\n",
+              "      border-bottom-color: var(--fill-color);\n",
+              "    }\n",
+              "    90% {\n",
+              "      border-color: transparent;\n",
+              "      border-bottom-color: var(--fill-color);\n",
+              "    }\n",
+              "  }\n",
+              "</style>\n",
+              "\n",
+              "      <script>\n",
+              "        async function quickchart(key) {\n",
+              "          const quickchartButtonEl =\n",
+              "            document.querySelector('#' + key + ' button');\n",
+              "          quickchartButtonEl.disabled = true;  // To prevent multiple clicks.\n",
+              "          quickchartButtonEl.classList.add('colab-df-spinner');\n",
+              "          try {\n",
+              "            const charts = await google.colab.kernel.invokeFunction(\n",
+              "                'suggestCharts', [key], {});\n",
+              "          } catch (error) {\n",
+              "            console.error('Error during call to suggestCharts:', error);\n",
+              "          }\n",
+              "          quickchartButtonEl.classList.remove('colab-df-spinner');\n",
+              "          quickchartButtonEl.classList.add('colab-df-quickchart-complete');\n",
+              "        }\n",
+              "        (() => {\n",
+              "          let quickchartButtonEl =\n",
+              "            document.querySelector('#df-dd46c47e-6c5d-40df-9ece-cac6fb87b6ff button');\n",
+              "          quickchartButtonEl.style.display =\n",
+              "            google.colab.kernel.accessAllowed ? 'block' : 'none';\n",
+              "        })();\n",
+              "      </script>\n",
+              "    </div>\n",
+              "\n",
+              "    </div>\n",
+              "  </div>\n"
+            ],
+            "application/vnd.google.colaboratory.intrinsic+json": {
+              "type": "dataframe",
+              "repr_error": "0"
+            }
+          },
+          "metadata": {},
+          "execution_count": 37
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Displaying the results\n",
+        "df.loc[df['name'] == \"Ines Prieto\", ['title ', 'release_year', 'imdb_score', 'genres']]"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 112
+        },
+        "id": "ZtmaqjLe17Q9",
+        "outputId": "32b3c442-cf56-4466-babd-eaad85517dfe"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "        title   release_year imdb_score      genres\n",
+              "77798  Lokillo          2021        3.8  ['comedy']\n",
+              "85576  Lokillo          2021        3.8  ['comedy']"
+            ],
+            "text/html": [
+              "\n",
+              "  <div id=\"df-da4d4e54-23d7-49b1-b9c0-59762de85cf4\" class=\"colab-df-container\">\n",
+              "    <div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>title</th>\n",
+              "      <th>release_year</th>\n",
+              "      <th>imdb_score</th>\n",
+              "      <th>genres</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>77798</th>\n",
+              "      <td>Lokillo</td>\n",
+              "      <td>2021</td>\n",
+              "      <td>3.8</td>\n",
+              "      <td>['comedy']</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>85576</th>\n",
+              "      <td>Lokillo</td>\n",
+              "      <td>2021</td>\n",
+              "      <td>3.8</td>\n",
+              "      <td>['comedy']</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div>\n",
+              "    <div class=\"colab-df-buttons\">\n",
+              "\n",
+              "  <div class=\"colab-df-container\">\n",
+              "    <button class=\"colab-df-convert\" onclick=\"convertToInteractive('df-da4d4e54-23d7-49b1-b9c0-59762de85cf4')\"\n",
+              "            title=\"Convert this dataframe to an interactive table.\"\n",
+              "            style=\"display:none;\">\n",
+              "\n",
+              "  <svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24px\" viewBox=\"0 -960 960 960\">\n",
+              "    <path d=\"M120-120v-720h720v720H120Zm60-500h600v-160H180v160Zm220 220h160v-160H400v160Zm0 220h160v-160H400v160ZM180-400h160v-160H180v160Zm440 0h160v-160H620v160ZM180-180h160v-160H180v160Zm440 0h160v-160H620v160Z\"/>\n",
+              "  </svg>\n",
+              "    </button>\n",
+              "\n",
+              "  <style>\n",
+              "    .colab-df-container {\n",
+              "      display:flex;\n",
+              "      gap: 12px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert {\n",
+              "      background-color: #E8F0FE;\n",
+              "      border: none;\n",
+              "      border-radius: 50%;\n",
+              "      cursor: pointer;\n",
+              "      display: none;\n",
+              "      fill: #1967D2;\n",
+              "      height: 32px;\n",
+              "      padding: 0 0 0 0;\n",
+              "      width: 32px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert:hover {\n",
+              "      background-color: #E2EBFA;\n",
+              "      box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 1px 3px 1px rgba(60, 64, 67, 0.15);\n",
+              "      fill: #174EA6;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-buttons div {\n",
+              "      margin-bottom: 4px;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert {\n",
+              "      background-color: #3B4455;\n",
+              "      fill: #D2E3FC;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert:hover {\n",
+              "      background-color: #434B5C;\n",
+              "      box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);\n",
+              "      filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));\n",
+              "      fill: #FFFFFF;\n",
+              "    }\n",
+              "  </style>\n",
+              "\n",
+              "    <script>\n",
+              "      const buttonEl =\n",
+              "        document.querySelector('#df-da4d4e54-23d7-49b1-b9c0-59762de85cf4 button.colab-df-convert');\n",
+              "      buttonEl.style.display =\n",
+              "        google.colab.kernel.accessAllowed ? 'block' : 'none';\n",
+              "\n",
+              "      async function convertToInteractive(key) {\n",
+              "        const element = document.querySelector('#df-da4d4e54-23d7-49b1-b9c0-59762de85cf4');\n",
+              "        const dataTable =\n",
+              "          await google.colab.kernel.invokeFunction('convertToInteractive',\n",
+              "                                                    [key], {});\n",
+              "        if (!dataTable) return;\n",
+              "\n",
+              "        const docLinkHtml = 'Like what you see? Visit the ' +\n",
+              "          '<a target=\"_blank\" href=https://colab.research.google.com/notebooks/data_table.ipynb>data table notebook</a>'\n",
+              "          + ' to learn more about interactive tables.';\n",
+              "        element.innerHTML = '';\n",
+              "        dataTable['output_type'] = 'display_data';\n",
+              "        await google.colab.output.renderOutput(dataTable, element);\n",
+              "        const docLink = document.createElement('div');\n",
+              "        docLink.innerHTML = docLinkHtml;\n",
+              "        element.appendChild(docLink);\n",
+              "      }\n",
+              "    </script>\n",
+              "  </div>\n",
+              "\n",
+              "\n",
+              "    <div id=\"df-d6a73236-6d27-4f58-a099-61fdf83d86b0\">\n",
+              "      <button class=\"colab-df-quickchart\" onclick=\"quickchart('df-d6a73236-6d27-4f58-a099-61fdf83d86b0')\"\n",
+              "                title=\"Suggest charts\"\n",
+              "                style=\"display:none;\">\n",
+              "\n",
+              "<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24px\"viewBox=\"0 0 24 24\"\n",
+              "     width=\"24px\">\n",
+              "    <g>\n",
+              "        <path d=\"M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z\"/>\n",
+              "    </g>\n",
+              "</svg>\n",
+              "      </button>\n",
+              "\n",
+              "<style>\n",
+              "  .colab-df-quickchart {\n",
+              "      --bg-color: #E8F0FE;\n",
+              "      --fill-color: #1967D2;\n",
+              "      --hover-bg-color: #E2EBFA;\n",
+              "      --hover-fill-color: #174EA6;\n",
+              "      --disabled-fill-color: #AAA;\n",
+              "      --disabled-bg-color: #DDD;\n",
+              "  }\n",
+              "\n",
+              "  [theme=dark] .colab-df-quickchart {\n",
+              "      --bg-color: #3B4455;\n",
+              "      --fill-color: #D2E3FC;\n",
+              "      --hover-bg-color: #434B5C;\n",
+              "      --hover-fill-color: #FFFFFF;\n",
+              "      --disabled-bg-color: #3B4455;\n",
+              "      --disabled-fill-color: #666;\n",
+              "  }\n",
+              "\n",
+              "  .colab-df-quickchart {\n",
+              "    background-color: var(--bg-color);\n",
+              "    border: none;\n",
+              "    border-radius: 50%;\n",
+              "    cursor: pointer;\n",
+              "    display: none;\n",
+              "    fill: var(--fill-color);\n",
+              "    height: 32px;\n",
+              "    padding: 0;\n",
+              "    width: 32px;\n",
+              "  }\n",
+              "\n",
+              "  .colab-df-quickchart:hover {\n",
+              "    background-color: var(--hover-bg-color);\n",
+              "    box-shadow: 0 1px 2px rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);\n",
+              "    fill: var(--button-hover-fill-color);\n",
+              "  }\n",
+              "\n",
+              "  .colab-df-quickchart-complete:disabled,\n",
+              "  .colab-df-quickchart-complete:disabled:hover {\n",
+              "    background-color: var(--disabled-bg-color);\n",
+              "    fill: var(--disabled-fill-color);\n",
+              "    box-shadow: none;\n",
+              "  }\n",
+              "\n",
+              "  .colab-df-spinner {\n",
+              "    border: 2px solid var(--fill-color);\n",
+              "    border-color: transparent;\n",
+              "    border-bottom-color: var(--fill-color);\n",
+              "    animation:\n",
+              "      spin 1s steps(1) infinite;\n",
+              "  }\n",
+              "\n",
+              "  @keyframes spin {\n",
+              "    0% {\n",
+              "      border-color: transparent;\n",
+              "      border-bottom-color: var(--fill-color);\n",
+              "      border-left-color: var(--fill-color);\n",
+              "    }\n",
+              "    20% {\n",
+              "      border-color: transparent;\n",
+              "      border-left-color: var(--fill-color);\n",
+              "      border-top-color: var(--fill-color);\n",
+              "    }\n",
+              "    30% {\n",
+              "      border-color: transparent;\n",
+              "      border-left-color: var(--fill-color);\n",
+              "      border-top-color: var(--fill-color);\n",
+              "      border-right-color: var(--fill-color);\n",
+              "    }\n",
+              "    40% {\n",
+              "      border-color: transparent;\n",
+              "      border-right-color: var(--fill-color);\n",
+              "      border-top-color: var(--fill-color);\n",
+              "    }\n",
+              "    60% {\n",
+              "      border-color: transparent;\n",
+              "      border-right-color: var(--fill-color);\n",
+              "    }\n",
+              "    80% {\n",
+              "      border-color: transparent;\n",
+              "      border-right-color: var(--fill-color);\n",
+              "      border-bottom-color: var(--fill-color);\n",
+              "    }\n",
+              "    90% {\n",
+              "      border-color: transparent;\n",
+              "      border-bottom-color: var(--fill-color);\n",
+              "    }\n",
+              "  }\n",
+              "</style>\n",
+              "\n",
+              "      <script>\n",
+              "        async function quickchart(key) {\n",
+              "          const quickchartButtonEl =\n",
+              "            document.querySelector('#' + key + ' button');\n",
+              "          quickchartButtonEl.disabled = true;  // To prevent multiple clicks.\n",
+              "          quickchartButtonEl.classList.add('colab-df-spinner');\n",
+              "          try {\n",
+              "            const charts = await google.colab.kernel.invokeFunction(\n",
+              "                'suggestCharts', [key], {});\n",
+              "          } catch (error) {\n",
+              "            console.error('Error during call to suggestCharts:', error);\n",
+              "          }\n",
+              "          quickchartButtonEl.classList.remove('colab-df-spinner');\n",
+              "          quickchartButtonEl.classList.add('colab-df-quickchart-complete');\n",
+              "        }\n",
+              "        (() => {\n",
+              "          let quickchartButtonEl =\n",
+              "            document.querySelector('#df-d6a73236-6d27-4f58-a099-61fdf83d86b0 button');\n",
+              "          quickchartButtonEl.style.display =\n",
+              "            google.colab.kernel.accessAllowed ? 'block' : 'none';\n",
+              "        })();\n",
+              "      </script>\n",
+              "    </div>\n",
+              "\n",
+              "    </div>\n",
+              "  </div>\n"
+            ],
+            "application/vnd.google.colaboratory.intrinsic+json": {
+              "type": "dataframe",
+              "repr_error": "0"
+            }
+          },
+          "metadata": {},
+          "execution_count": 38
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "# Task 4: Finding Highly Rated Movies\n",
+        "We want to identify movies with an IMDb rating of at least 9.0. This list could be helpful for curating a \"Top Movies\" section based on high ratings.\n",
+        "- First filter the DataFrame to include only rows where imdb_score is greater than 9.0.\n",
+        "- From this filtered DataFrame, select only the title column.\n",
+        "- Convert the resulting list of titles to a set to remove any duplicate titles. Using set() will keep only unique movie names.\n",
+        "- Display the final set of unique movie titles to see the list of top-rated movies."
+      ],
+      "metadata": {
+        "id": "SoUP6olz1lxR"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# The sheet didn't transfer the types over correctly.\n",
+        "# Use pd.to_numeric with errors='coerce' to handle non-numeric values by turning them into NaN.\n",
+        "df['imdb_score'] = pd.to_numeric(df['imdb_score'], errors='coerce')\n",
+        "\n",
+        "# Filtering for movies with IMDb score above 9.0 and dropping any rows with NaN in imdb_score\n",
+        "score = df[df['imdb_score'] > 9.0].dropna(subset=['imdb_score'])\n",
+        "\n",
+        "#Extract the 'title ' column from the filtered DataFrame\n",
+        "titles = score['title ']\n",
+        "\n",
+        "# Get a unique set of titles\n",
+        "unique_titles = set(titles)\n",
+        "\n",
+        "# Print the unique titles\n",
+        "print(unique_titles)"
+      ],
+      "metadata": {
+        "id": "lufVbdkf2fGB",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "d45613a3-7dce-4041-b95e-892f75df8050"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "{'The Last Dance', 'Major', 'Reply 1988', 'Kota Factory', 'Avatar: The Last Airbender', 'Breaking Bad', 'Our Planet', 'My Mister'}\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "# Task 5: Creating a Function to Find Unique Top-Rated Movies\n",
+        "In this task, we'll create a function to find unique movies with an IMDb score above a certain threshold that the user provides.\n",
+        "- Create a function called get_unique__top_movies that takes one parameter, min_score.\n",
+        "- Inside the function, create a new variable that stores rows where the imbd_score is greater than or equal to min_score.\n",
+        "- In a new varibale, select the title column from the filtered DataFrame.\n",
+        "- Convert the variable to a set using set() to automatically remove duplicates, ensuring each title appears only once.\n",
+        "- Make sure the function returns the unique_titles set.\n"
+      ],
+      "metadata": {
+        "id": "E6bf9CcE3Jsj"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# The sheet didn't transfer the types over correctly.\n",
+        "# Use pd.to_numeric with errors='coerce' to handle non-numeric values by turning them into NaN.\n",
+        "df['imdb_votes'] = pd.to_numeric(df['imdb_votes'], errors='coerce')\n",
+        "\n",
+        "# Define the function\n",
+        "def get_unique_top_movies(min_score):\n",
+        "    # Filter for movies with IMDb score above min_score\n",
+        "    high_score_df = df[df['imdb_score'] >= min_score]\n",
+        "\n",
+        "    # Extract the 'title' column\n",
+        "    high_score_titles = df.loc[df['imdb_score'] >= min_score, 'title ']\n",
+        "\n",
+        "    # Remove duplicate titles\n",
+        "    high_score_titles = set(high_score_titles)\n",
+        "\n",
+        "    # Return unique titles\n",
+        "    return high_score_titles"
+      ],
+      "metadata": {
+        "id": "XdT-0-XO-CgH"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Test the function\n",
+        "print(get_unique_top_movies(9.0))"
+      ],
+      "metadata": {
+        "id": "skXXtPZP-Ygu",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "83fb30e6-1aed-4942-de6f-8dd6f9e4a532"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "{'The Last Dance', 'Attack on Titan', 'Major', 'Reply 1988', 'Leah Remini: Scientology and the Aftermath', 'My Mister', 'Kota Factory', 'Arcane', 'Avatar: The Last Airbender', 'Breaking Bad', 'Okupas', 'Our Planet', 'DEATH NOTE', 'Hunter x Hunter'}\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "# Task 6: Creating a Function to Find Top Movies from a Specific Decade\n",
+        "Let's create a function to retrieve movies from a particular decade with high IMDb ratings. This function can be useful for generating lists of top-rated movies from different time periods.\n",
+        "- Create a function called get_top_movies_from_decade that accepts decade_start and min_score as parameters.\n",
+        "- Inside the function, filter the DataFrame to include only movies where release_year is within the specified decade.\n",
+        "- Further filter this subset to include only movies where imdb_score is greater than or equal to min_score.\n",
+        "- From the resulting DataFrame, select the title column and remove duplicates using set().\n",
+        "- Return the set of the best movies from that decade.\n",
+        "\n",
+        "\n"
+      ],
+      "metadata": {
+        "id": "OxhVrjIx-fmG"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Define the function\n",
+        "def get_top_movies_from_decade(decade_start, min_score):\n",
+        "    # Filter for movies released within the decade\n",
+        "    decade = df[(df['release_year'] >= decade_start) & (df['release_year'] <= decade_start + 9)]\n",
+        "\n",
+        "    # Further filter by IMDb score\n",
+        "    decade = decade[decade['imdb_score'] >= min_score]\n",
+        "\n",
+        "    # Extract and remove duplicate titles\n",
+        "    titles = set(decade['title '])\n",
+        "\n",
+        "    # Return unique titles\n",
+        "    return titles"
+      ],
+      "metadata": {
+        "id": "Ke8XqLkx-3tm"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Test the function\n",
+        "print(get_top_movies_from_decade(1990, 8.5))"
+      ],
+      "metadata": {
+        "id": "G9ts84NT_A5n",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "8f0c17d7-4d17-4814-a139-64ddd3384248"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "{'GoodFellas', 'Se7en', 'L??on: The Professional', 'Cowboy Bebop', 'Forrest Gump', 'One Piece', 'Neon Genesis Evangelion', 'Bill Hicks: Revelations'}\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "# Task 7: Creating a Function to List All Actors in a Given Title\n",
+        "\n",
+        "Imagine you want to list all the actors in a specific movie or show. Let's create a function that takes a title as input and returns the names of all actors in that title, combined into a single string.\n",
+        "- Create a function called get_actors_for_title that accepts one parameter, title.\n",
+        "- Inside the function, filter the DataFrame to select rows where the title column matches the provided title parameter and the role column is \"ACTOR\" (to ensure you only retrieve actors).\n",
+        "- From this filtered DataFrame, select only the `name` column to get the actor names.\n",
+        "- Use `', '.join()` to combine the list of actor names into a single string, with each name separated by a comma.\n",
+        "- Return the resulting string of actor names.\n",
+        "\n"
+      ],
+      "metadata": {
+        "id": "FMuY6qSk_EUH"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Define the function\n",
+        "def get_actors_for_title(title):\n",
+        "    # Filter for rows with the specified title and role as 'ACTOR'\n",
+        "    title_df = df[(df['title '] == title) & (df['role '] == 'ACTOR')]\n",
+        "\n",
+        "\n",
+        "    # Extract the 'name' column for actor names\n",
+        "    title_df = title_df['name']\n",
+        "\n",
+        "    # Combine names into a single string\n",
+        "    combined_names = ', '.join(title_df.tolist())\n",
+        "\n",
+        "\n",
+        "    # Return the result\n",
+        "    return combined_names"
+      ],
+      "metadata": {
+        "id": "OM3GBPCU_fGL"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Test the function\n",
+        "print(get_actors_for_title(\"Taxi Driver\"))"
+      ],
+      "metadata": {
+        "id": "plzqIAeh_hrU",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "f0af8ec3-f4be-4b02-91c5-4f5c1228ebe0"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Robert De Niro, Jodie Foster, Albert Brooks, Harvey Keitel, Cybill Shepherd, Peter Boyle, Leonard Harris, Diahnne Abbott, Gino Ardito, Martin Scorsese, Murray Moston, Richard Higgs, Bill Minkin, Bob Maroff, Victor Argo, Joe Spinell, Robinson Frank Adu, Brenda Dickson, Norman Matlock, Harry Northup, Harlan Cary Poe, Steven Prince, Peter Savage, Nicholas Shields, Ralph S. Singleton, Annie Gagen, Carson Grant, Mary-Pat Green, Debbi Morgan, Don Stroud, Copper Cunningham, Garth Avery, Nat Grant, Billie Perkins, Catherine Scorsese, Charles Scorsese, Odunlade Adekola, Ijeoma Grace Agu\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "# Task 8: Creating a Function to Categorize Movies by IMDb Score\n",
+        "Let's categorize movies and shows based on their IMDb scores to provide a quick evaluation of their popularity or quality. We'll create a function that takes in a title and returns a rating category based on the movie or show's IMDb score.\n",
+        "\n",
+        "- Create a function called categorize_imdb_score that accepts one parameter, title.\n",
+        "- Inside the function, filter the DataFrame to find the row where title matches the given title.\n",
+        "- If the title exists, retrieve the imdb_score for that movie or show.\n",
+        "- If the title is not found, return \"Title not found\".\n",
+        "- Use if-elif-else statements to evaluate the imdb_score and return one of the rating categories based on the ranges provided.\n",
+        "- Return the appropriate category based on the score.\n",
+        "\n",
+        "**Rating Categories**\n",
+        "- Excellent: IMDb score of 9.0 or higher\n",
+        "- Good: IMDb score between 7.0 and 8.9\n",
+        "- Average: IMDb score between 5.0 and 6.9\n",
+        "- Low: IMDb score below 5.0\n",
+        "\n"
+      ],
+      "metadata": {
+        "id": "U-lOSxKM_lWv"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Define the function\n",
+        "def categorize_imdb_score(title):\n",
+        "    # Filter for the row with the specified title\n",
+        "    title_df = df[df['title '] == title]\n",
+        "\n",
+        "    # Check if title exists\n",
+        "    if title_df.empty:\n",
+        "        return \"Title not found\"\n",
+        "\n",
+        "    else:\n",
+        "        # Retrieve the IMDb score for the movie\n",
+        "        results = []\n",
+        "        for score in title_df['imdb_score']:\n",
+        "            if score >= 9.0:\n",
+        "                results.append(f'Score: {score} - Excellent!!')\n",
+        "            elif (score >= 7.0) & (score <= 8.9):\n",
+        "                results.append(f'Score: {score} - Good!')\n",
+        "            elif (score >= 5.0) & (score <= 6.5):\n",
+        "                results.append(f'Score: {score} - Average.')\n",
+        "            else:\n",
+        "                results.append(f'Score: {score} - Low...')\n",
+        "\n",
+        "\n",
+        "    # Categorize score using if-else and return the ranking accordingly\n",
+        "    return results"
+      ],
+      "metadata": {
+        "id": "975wxvLfQY__"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Test the function\n",
+        "print(categorize_imdb_score(\"Taxi Driver\"))"
+      ],
+      "metadata": {
+        "id": "vXtcZQx1QeD7",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "021e2d3d-02ed-4c69-c9c6-e1c43f3c5cf2"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "['Score: 8.2 - Good!', 'Score: 8.2 - Good!', 'Score: 8.2 - Good!', 'Score: 8.2 - Good!', 'Score: 8.2 - Good!', 'Score: 8.2 - Good!', 'Score: 8.2 - Good!', 'Score: 8.2 - Good!', 'Score: 8.2 - Good!', 'Score: 8.2 - Good!', 'Score: 8.2 - Good!', 'Score: 8.2 - Good!', 'Score: 8.2 - Good!', 'Score: 8.2 - Good!', 'Score: 8.2 - Good!', 'Score: 8.2 - Good!', 'Score: 8.2 - Good!', 'Score: 8.2 - Good!', 'Score: 8.2 - Good!', 'Score: 8.2 - Good!', 'Score: 8.2 - Good!', 'Score: 8.2 - Good!', 'Score: 8.2 - Good!', 'Score: 8.2 - Good!', 'Score: 8.2 - Good!', 'Score: 8.2 - Good!', 'Score: 8.2 - Good!', 'Score: 8.2 - Good!', 'Score: 8.2 - Good!', 'Score: 8.2 - Good!', 'Score: 8.2 - Good!', 'Score: 8.2 - Good!', 'Score: 8.2 - Good!', 'Score: 8.2 - Good!', 'Score: 8.2 - Good!', 'Score: 8.2 - Good!', 'Score: 8.2 - Good!', 'Score: 6.0 - Average.', 'Score: 6.0 - Average.', 'Score: 6.0 - Average.']\n"
+          ]
+        }
+      ]
+    }
+  ]
+}
